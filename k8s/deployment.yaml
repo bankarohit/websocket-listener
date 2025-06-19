@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: websocket-listener
+  template:
+    metadata:
+      labels:
+        app: websocket-listener
+    spec:
+      containers:
+        - name: websocket-listener
+          image: your-docker-image:latest
+          env:
+            - name: FYERS_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fyers-secret
+                  key: app_id
+            - name: FYERS_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: fyers-secret
+                  key: access_token
+            - name: FYERS_WEBSOCKET_URL
+              value: wss://example.com/ws
+            - name: REDIS_URL
+              value: redis://redis:6379/0
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-listener
+spec:
+  selector:
+    app: websocket-listener
+  ports:
+    - port: 80
+      targetPort: 8000
