@@ -57,7 +57,17 @@ async def connect_and_listen() -> None:
         on_trades=dispatch,
     )
 
-    socket.connect()
-
+    attempt = 0
     while True:
-        await asyncio.sleep(1)
+        try:
+            socket.connect()
+            attempt = 0
+            while True:
+                await asyncio.sleep(1)
+        except Exception:
+            attempt += 1
+            logger.exception("Connection attempt %s failed", attempt)
+            if attempt >= settings.MAX_RETRIES:
+                raise
+            delay = settings.RETRY_DELAY * 2 ** (attempt - 1)
+            await asyncio.sleep(delay)
