@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ```
 FYERS_APP_ID=your-app-id
 FYERS_ACCESS_TOKEN=access-token
-FYERS_WEBSOCKET_URL=wss://example.com/ws
+FYERS_SUBSCRIPTION_TYPE=OnOrders
 REDIS_URL=redis://localhost:6379/0
 LOG_LEVEL=INFO
 ```
