@@ -10,5 +10,7 @@ class Settings:
 
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    MAX_RETRIES: int = int(os.getenv("MAX_RETRIES", "5"))
+    RETRY_DELAY: float = float(os.getenv("RETRY_DELAY", "1"))
 
 settings = Settings()

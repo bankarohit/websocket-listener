@@ -18,6 +18,8 @@ FYERS_ACCESS_TOKEN=access-token
 FYERS_SUBSCRIPTION_TYPE=OnOrders
 REDIS_URL=redis://localhost:6379/0
 LOG_LEVEL=INFO
+MAX_RETRIES=5
+RETRY_DELAY=1
 ```
 
 3. Run the service:
