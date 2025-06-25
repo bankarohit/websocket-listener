@@ -9,6 +9,7 @@ _redis = None
 async def get_client(timeout: float | None = None) -> redis.Redis:
     global _redis
     if _redis is None:
+        logger.info("Connecting to Redis at %s", settings.REDIS_URL)
         _redis = redis.from_url(settings.REDIS_URL, socket_timeout=timeout)
         try:
             await _redis.ping()

@@ -1,7 +1,10 @@
 import os
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 class Settings:
     FYERS_APP_ID: str = os.getenv("FYERS_APP_ID", "")
