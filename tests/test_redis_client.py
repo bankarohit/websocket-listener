@@ -27,7 +27,8 @@ async def test_set_status_logs_error(monkeypatch, caplog):
     err = ErrorRedis()
     monkeypatch.setattr(redis_client, "_redis", err, raising=False)
     with caplog.at_level(logging.ERROR):
-        await redis_client.set_status("k", "v")
+        with pytest.raises(RuntimeError):
+            await redis_client.set_status("k", "v")
     assert "Failed to set key" in caplog.text
 
 

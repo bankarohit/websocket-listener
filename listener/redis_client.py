@@ -24,3 +24,4 @@ async def set_status(key: str, value: str, timeout: float | None = None) -> None
         await client.set(key, value)
     except Exception:
         logger.exception("Failed to set key %s", key)
+        raise
