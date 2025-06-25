@@ -1,8 +1,9 @@
-fastapi
+fastapi~=0.95
+starlette~=0.27
 uvicorn
-websockets
+websockets~=11.0
 redis
 python-dotenv
 pytest
 pytest-asyncio
-httpx
+httpx~=0.24
