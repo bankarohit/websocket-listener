@@ -5,6 +5,6 @@ websockets~=11.0
 redis
 python-dotenv
 fyers-apiv3
-pytest
-pytest-asyncio
 httpx>=0.24,<0.25
+pydantic-settings
+setuptools

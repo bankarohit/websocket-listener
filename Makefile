@@ -1,7 +1,10 @@
-.PHONY: install run test docker-build docker-run
+.PHONY: install install-dev run test docker-build docker-run
 
 install:
-	pip install -r requirements.txt
+        pip install -r requirements.txt
+
+install-dev: install
+        pip install -r requirements-dev.txt
 
 run:
 	python -m listener.main
