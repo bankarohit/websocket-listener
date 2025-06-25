@@ -14,3 +14,7 @@ docker-build:
 
 docker-run:
 	docker run -p 8000:8000 websocket-listener
+
+venv:
+    python -m venv .venv
+    . .venv/bin/activate && pip install -r requirements.txt
