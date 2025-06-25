@@ -20,6 +20,7 @@ async def handle_message(message: Any) -> None:
             data = {"raw": message}
     else:
         data = message
+    logger.debug("Received message: %s", data)
 
     key = (
         data.get("id")
@@ -60,6 +61,7 @@ async def connect_and_listen() -> None:
     attempt = 0
     while True:
         try:
+            logger.info("Connecting to Fyers WebSocket")
             socket.connect()
             attempt = 0
             while True:
