@@ -7,4 +7,4 @@ python-dotenv
 fyers-apiv3
 pytest
 pytest-asyncio
-httpx~=0.24
+httpx>=0.24,<0.25

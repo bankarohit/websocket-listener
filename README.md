@@ -10,6 +10,8 @@ This service connects to the Fyers WebSocket API and mirrors order/position upda
 make install
 ```
 
+   This project requires `httpx` version `>=0.24,<0.25`.
+
 2. Create a `.env` file with the following variables or export them in your environment:
 
 ```
