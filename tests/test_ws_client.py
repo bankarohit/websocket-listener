@@ -24,6 +24,21 @@ async def test_handle_message_sets_redis(fake_redis):
 
 
 @pytest.mark.asyncio
+async def test_handle_message_invalid_json(fake_redis):
+    invalid = "{bad json}"
+    await ws_client.handle_message(invalid)
+    expected = json.dumps({"raw": invalid})
+    assert fake_redis["fyers:last"] == expected
+
+
+@pytest.mark.asyncio
+async def test_handle_message_with_orders_id(fake_redis):
+    payload = {"orders": {"id": "42"}, "status": "open"}
+    await ws_client.handle_message(payload)
+    assert fake_redis["fyers:42"] == json.dumps(payload)
+
+
+@pytest.mark.asyncio
 async def test_connect_and_listen_retries(monkeypatch):
     attempts = 0
 
