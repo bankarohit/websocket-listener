@@ -56,3 +56,7 @@ pytest
 ## Integration with Webhook Service
 
 This listener stores updates in Redis under keys prefixed with `fyers:`. The existing webhook service can read these keys to keep trade status in sync.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
