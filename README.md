@@ -7,7 +7,7 @@ This service connects to the Fyers WebSocket API and mirrors order/position upda
 1. Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+make install
 ```
 
 2. Create a `.env` file with the following variables or export them in your environment:
@@ -23,10 +23,22 @@ LOG_LEVEL=INFO
 3. Run the service:
 
 ```bash
-python -m listener.main
+make run
 ```
 
 The health endpoint will be available on `http://localhost:8000/healthz`.
+
+## Makefile
+
+Common tasks are available via `make` commands:
+
+```bash
+make install       # install dependencies
+make run           # start the service
+make test          # run unit tests
+make docker-build  # build the Docker image
+make docker-run    # run the Docker container
+```
 
 ## Docker
 
@@ -50,7 +62,7 @@ kubectl apply -f k8s/deployment.yaml
 Run unit tests with:
 
 ```bash
-pytest
+make test
 ```
 
 ## Integration with Webhook Service
