@@ -7,6 +7,7 @@ from .config import settings
 from .redis_client import set_status
 
 logger = logging.getLogger(__name__)
+logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
 
 async def handle_message(message: str) -> None:
     try:
