@@ -15,7 +15,7 @@ async def handle_message(message: str) -> None:
     except json.JSONDecodeError:
         data = {"raw": message}
     key = data.get("id", "last")
-    set_status(f"fyers:{key}", json.dumps(data))
+    await set_status(f"fyers:{key}", json.dumps(data))
 
 async def connect_and_listen():
     backoff = 1

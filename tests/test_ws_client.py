@@ -7,7 +7,7 @@ import pytest
 from listener import ws_client, redis_client
 
 class FakeRedis(dict):
-    def set(self, key, value):
+    async def set(self, key, value):
         self[key] = value
 
 @pytest.fixture(autouse=True)
