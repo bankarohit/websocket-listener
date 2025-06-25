@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     """Validate and expose environment configuration."""
 
     FYERS_APP_ID: str = Field("", env="FYERS_APP_ID")
+    FYERS_SECRET_KEY: str = Field("", env="FYERS_SECRET_KEY")
+    FYERS_REDIRECT_URI: str = Field("", env="FYERS_REDIRECT_URI")
     FYERS_ACCESS_TOKEN: str = Field("", env="FYERS_ACCESS_TOKEN")
     FYERS_SUBSCRIPTION_TYPE: str = Field("OnOrders", env="FYERS_SUBSCRIPTION_TYPE")
 

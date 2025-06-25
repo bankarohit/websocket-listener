@@ -20,6 +20,8 @@ make install-dev        # production + testing
 
 ```
 FYERS_APP_ID=your-app-id
+FYERS_SECRET_KEY=your-secret
+FYERS_REDIRECT_URI=https://your-app/callback
 FYERS_ACCESS_TOKEN=access-token
 FYERS_SUBSCRIPTION_TYPE=OnOrders
 REDIS_URL=redis://localhost:6379/0
@@ -27,6 +29,15 @@ LOG_LEVEL=INFO
 MAX_RETRIES=5
 RETRY_DELAY=1
 ```
+
+Run `python -m listener.auth` to generate a login URL. After logging in and
+authorising the app, copy the `auth_code` from the redirect and run
+
+```bash
+python -m listener.auth --auth-code <code> --write-env
+```
+
+This prints the access token and writes it to `.env` when `--write-env` is used.
 
 3. Run the service:
 
