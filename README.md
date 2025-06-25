@@ -12,7 +12,8 @@ make install
 
    This project requires `httpx` version `>=0.24,<0.25`.
 
-2. Create a `.env` file with the following variables or export them in your environment:
+2. Create a `.env` file with the following variables (or export them in your environment). The `Settings` class
+   in `listener/config.py` uses Pydantic `BaseSettings` to automatically load this file:
 
 ```
 FYERS_APP_ID=your-app-id

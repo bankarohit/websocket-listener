@@ -1,19 +1,26 @@
-import os
-import logging
-from dotenv import load_dotenv
+"""Application configuration handled via Pydantic settings."""
 
-load_dotenv()
+try:  # Pydantic <2.5
+    from pydantic import BaseSettings
+except Exception:  # pragma: no cover - fall back for Pydantic >=2.0
+    from pydantic_settings import BaseSettings  # type: ignore
 
-logger = logging.getLogger(__name__)
 
-class Settings:
-    FYERS_APP_ID: str = os.getenv("FYERS_APP_ID", "")
-    FYERS_ACCESS_TOKEN: str = os.getenv("FYERS_ACCESS_TOKEN", "")
-    FYERS_SUBSCRIPTION_TYPE: str = os.getenv("FYERS_SUBSCRIPTION_TYPE", "OnOrders")
+class Settings(BaseSettings):
+    """Validate and expose environment configuration."""
 
-    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    MAX_RETRIES: int = int(os.getenv("MAX_RETRIES", "5"))
-    RETRY_DELAY: float = float(os.getenv("RETRY_DELAY", "1"))
+    FYERS_APP_ID: str = ""
+    FYERS_ACCESS_TOKEN: str = ""
+    FYERS_SUBSCRIPTION_TYPE: str = "OnOrders"
+
+    REDIS_URL: str = "redis://localhost:6379/0"
+    LOG_LEVEL: str = "INFO"
+    MAX_RETRIES: int = 5
+    RETRY_DELAY: float = 1.0
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
 
 settings = Settings()
