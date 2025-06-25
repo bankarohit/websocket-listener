@@ -26,7 +26,7 @@ async def handle_message(message: Any) -> None:
         or data.get("orders", {}).get("id")
         or "last"
     )
-    set_status(f"fyers:{key}", json.dumps(data))
+    await set_status(f"fyers:{key}", json.dumps(data))
 
 async def connect_and_listen() -> None:
     """Connect to the Fyers WebSocket and process updates indefinitely."""
