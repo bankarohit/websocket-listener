@@ -1,4 +1,4 @@
-import redis
+import redis.asyncio as redis
 from .config import settings
 
 _redis = None
@@ -9,6 +9,6 @@ def get_client() -> redis.Redis:
         _redis = redis.from_url(settings.REDIS_URL)
     return _redis
 
-def set_status(key: str, value: str) -> None:
+async def set_status(key: str, value: str) -> None:
     client = get_client()
-    client.set(key, value)
+    await client.set(key, value)
