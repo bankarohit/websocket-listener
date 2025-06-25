@@ -69,3 +69,44 @@ async def test_connect_and_listen_retries(monkeypatch):
         await ws_client.connect_and_listen()
     assert attempts == 3
 
+
+@pytest.mark.asyncio
+async def test_connect_and_listen_success(monkeypatch):
+    class FakeSocket:
+        def __init__(self, *args, **kwargs):
+            self.calls = 0
+
+        def subscribe(self, *args, **kwargs):
+            pass
+
+        def keep_running(self):
+            pass
+
+        def connect(self):
+            self.calls += 1
+
+    socket = FakeSocket()
+
+    class ExitLoop(BaseException):
+        pass
+
+    async def stop_sleep(_):
+        raise ExitLoop()
+
+    monkeypatch.setattr(ws_client, "FyersOrderSocket", lambda *a, **k: socket)
+    monkeypatch.setattr(asyncio, "sleep", stop_sleep)
+
+    with pytest.raises(ExitLoop) as exc:
+        await ws_client.connect_and_listen()
+
+    assert socket.calls == 1
+
+    tb = exc.value.__traceback__
+    attempt = None
+    while tb:
+        if tb.tb_frame.f_code.co_name == "connect_and_listen":
+            attempt = tb.tb_frame.f_locals["attempt"]
+            break
+        tb = tb.tb_next
+    assert attempt == 0
+
