@@ -7,7 +7,8 @@ This service connects to the Fyers WebSocket API and mirrors order/position upda
 1. Install dependencies:
 
 ```bash
-make install
+make install            # production only
+make install-dev        # production + testing
 ```
 
    This project requires `httpx` version `>=0.24,<0.25`.
@@ -40,7 +41,8 @@ The health endpoint will be available on `http://localhost:8000/healthz`.
 Common tasks are available via `make` commands:
 
 ```bash
-make install       # install dependencies
+make install       # install production dependencies
+make install-dev   # install production and dev dependencies
 make run           # start the service
 make test          # run unit tests
 make docker-build  # build the Docker image
@@ -55,6 +57,9 @@ Build and run the image:
 docker build -t websocket-listener .
 docker run -p 8000:8000 websocket-listener
 ```
+
+To include development dependencies in the image pass `--build-arg INSTALL_DEV=true`
+to the build command.
 
 ## Kubernetes
 
