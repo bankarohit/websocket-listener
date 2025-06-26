@@ -61,3 +61,47 @@ def test_main_starts_thread_and_runs_listener(monkeypatch):
 
     assert events["thread_started"] is True
     assert events["connect_called"] is True
+
+
+def test_main_exchanges_auth_code(monkeypatch):
+    events = {}
+
+    monkeypatch.setattr(main_mod.uvicorn, "run", lambda *a, **k: None)
+
+    async def fake_exchange(code):
+        events["code"] = code
+        return "TOKEN123"
+
+    monkeypatch.setattr(main_mod.auth, "exchange_auth_code", fake_exchange)
+
+    async def fake_connect_and_listen():
+        events["token"] = main_mod.settings.FYERS_ACCESS_TOKEN
+
+    monkeypatch.setattr(main_mod, "connect_and_listen", fake_connect_and_listen)
+
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            self.target = target
+
+        def start(self):
+            if self.target:
+                self.target()
+
+    monkeypatch.setattr(main_mod.threading, "Thread", FakeThread)
+
+    monkeypatch.setattr(main_mod.settings, "FYERS_ACCESS_TOKEN", "", raising=False)
+    monkeypatch.setattr(main_mod.settings, "FYERS_AUTH_CODE", "CODE", raising=False)
+
+    def fake_asyncio_run(coro):
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.close()
+
+    monkeypatch.setattr(main_mod.asyncio, "run", fake_asyncio_run)
+
+    main_mod.main()
+
+    assert events["code"] == "CODE"
+    assert events["token"] == "TOKEN123"

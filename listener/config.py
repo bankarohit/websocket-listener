@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     FYERS_SECRET_KEY: str = Field("", env="FYERS_SECRET_KEY")
     FYERS_REDIRECT_URI: str = Field("", env="FYERS_REDIRECT_URI")
     FYERS_ACCESS_TOKEN: str = Field("", env="FYERS_ACCESS_TOKEN")
+    FYERS_AUTH_CODE: str = Field("", env="FYERS_AUTH_CODE")
     FYERS_SUBSCRIPTION_TYPE: str = Field("OnOrders", env="FYERS_SUBSCRIPTION_TYPE")
 
     REDIS_URL: str = Field("redis://localhost:6379/0", env="REDIS_URL")
