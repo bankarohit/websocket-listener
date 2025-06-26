@@ -6,6 +6,7 @@ import uvicorn
 from .health import app
 from .ws_client import connect_and_listen
 from .config import settings
+from . import auth
 
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
@@ -23,6 +24,16 @@ def main():
     logger.info("Launching server thread")
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
+    if not settings.FYERS_ACCESS_TOKEN and settings.FYERS_AUTH_CODE:
+        logger.info("Exchanging auth code for access token")
+        try:
+            token = asyncio.run(auth.exchange_auth_code(settings.FYERS_AUTH_CODE))
+            if token:
+                settings.FYERS_ACCESS_TOKEN = token
+            else:
+                logger.warning("Auth code exchange returned empty token")
+        except Exception:
+            logger.exception("Failed to exchange auth code")
     logger.info("Starting WebSocket listener")
     asyncio.run(connect_and_listen())
 
