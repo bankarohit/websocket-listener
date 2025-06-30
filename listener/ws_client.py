@@ -7,6 +7,7 @@ from fyers_apiv3.FyersWebsocket.order_ws import FyersOrderSocket
 
 from .config import settings
 from .redis_client import set_status
+from . import auth
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,35 @@ async def connect_and_listen() -> None:
             attempt = 0
             while True:
                 await asyncio.sleep(1)
-        except Exception:
+        except Exception as exc:
+            msg = str(exc).lower()
+            if (
+                settings.FYERS_REFRESH_TOKEN
+                and "token" in msg
+                and ("expired" in msg or "unauth" in msg or "invalid" in msg)
+            ):
+                try:
+                    logger.info("Refreshing access token")
+                    new = await auth.refresh_access_token(
+                        settings.FYERS_REFRESH_TOKEN,
+                        settings.FYERS_PIN,
+                    )
+                    if new:
+                        settings.FYERS_ACCESS_TOKEN = new
+                        socket = FyersOrderSocket(
+                            access_token=new,
+                            on_connect=on_connect,
+                            on_close=on_close,
+                            on_error=on_error,
+                            on_general=dispatch,
+                            on_orders=dispatch,
+                            on_positions=dispatch,
+                            on_trades=dispatch,
+                        )
+                        continue
+                except Exception:
+                    logger.exception("Token refresh failed")
+
             attempt += 1
             logger.exception("Connection attempt %s failed", attempt)
             if attempt >= settings.MAX_RETRIES:

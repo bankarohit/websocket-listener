@@ -110,3 +110,48 @@ async def test_connect_and_listen_success(monkeypatch):
         tb = tb.tb_next
     assert attempt == 0
 
+
+@pytest.mark.asyncio
+async def test_connect_and_listen_refresh(monkeypatch):
+    events = {"refresh": 0, "tokens": []}
+
+    class FakeSocket:
+        def __init__(self, access_token=None, **kwargs):
+            self.access_token = access_token
+            self.calls = 0
+            events["tokens"].append(access_token)
+
+        def subscribe(self, *args, **kwargs):
+            pass
+
+        def keep_running(self):
+            pass
+
+        def connect(self):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("token expired")
+
+    class ExitLoop(BaseException):
+        pass
+
+    async def stop_sleep(_):
+        raise ExitLoop()
+
+    async def fake_refresh(token, pin):
+        events["refresh"] += 1
+        return "NEWTOKEN"
+
+    monkeypatch.setattr(ws_client, "FyersOrderSocket", lambda *a, **k: FakeSocket(*a, **k))
+    monkeypatch.setattr(asyncio, "sleep", stop_sleep)
+    monkeypatch.setattr(ws_client.auth, "refresh_access_token", fake_refresh)
+    monkeypatch.setattr(ws_client.settings, "FYERS_REFRESH_TOKEN", "REF", raising=False)
+    monkeypatch.setattr(ws_client.settings, "FYERS_PIN", "1234", raising=False)
+    monkeypatch.setattr(ws_client.settings, "FYERS_ACCESS_TOKEN", "OLD", raising=False)
+
+    with pytest.raises(ExitLoop):
+        await ws_client.connect_and_listen()
+
+    assert events["refresh"] == 1
+    assert events["tokens"] == ["OLD", "NEWTOKEN"]
+
