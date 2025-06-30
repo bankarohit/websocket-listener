@@ -22,8 +22,9 @@ make install-dev        # production + testing
 FYERS_APP_ID=your-app-id
 FYERS_SECRET_KEY=your-secret
 FYERS_REDIRECT_URI=https://your-app/callback
-FYERS_ACCESS_TOKEN=access-token
-FYERS_AUTH_CODE=optional-auth-code
+FYERS_ACCESS_TOKEN=optional-access-token
+FYERS_AUTH_CODE=auth-code-from-login
+FYERS_REFRESH_TOKEN=optional-refresh-token
 FYERS_SUBSCRIPTION_TYPE=OnOrders
 REDIS_URL=redis://localhost:6379/0
 LOG_LEVEL=INFO
@@ -32,16 +33,18 @@ RETRY_DELAY=1
 ```
 
 Run `python -m listener.auth` to generate a login URL. After logging in and
-authorising the app, copy the `auth_code` from the redirect and run
+authorising the app, copy the `auth_code` from the redirect and set it as
+`FYERS_AUTH_CODE` in your environment. You can optionally exchange the code
+yourself with:
 
 ```bash
 python -m listener.auth --auth-code <code> --write-env
 ```
 
-This prints the access token and writes it to `.env` when `--write-env` is used.
-Alternatively, you can provide `FYERS_AUTH_CODE` to the service. If
-`FYERS_ACCESS_TOKEN` is empty, the listener will automatically exchange the
-authorization code for an access token on startup.
+This prints the resulting access token and writes it to `.env` when
+`--write-env` is supplied. Provide `FYERS_REFRESH_TOKEN` alongside the auth code
+if refresh support is enabled. When `FYERS_ACCESS_TOKEN` is absent, the service
+automatically exchanges `FYERS_AUTH_CODE` for a new token on startup.
 
 3. Run the service:
 
@@ -78,7 +81,10 @@ to the build command.
 
 ## Kubernetes
 
-A sample deployment is provided in `k8s/deployment.yaml`. It expects secrets `fyers-secret` containing `app_id` and `access_token` keys. Update the image field with your built image and apply the manifest:
+A sample deployment is provided in `k8s/deployment.yaml`. It expects a secret
+named `fyers-secret` containing at least `app_id` and `auth_code` keys (add
+`refresh_token` if you use token refresh). Update the image field with your
+built image and apply the manifest:
 
 ```bash
 kubectl apply -f k8s/deployment.yaml
