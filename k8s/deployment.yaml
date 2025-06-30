@@ -21,11 +21,16 @@ spec:
                 secretKeyRef:
                   name: fyers-secret
                   key: app_id
-            - name: FYERS_ACCESS_TOKEN
+            - name: FYERS_AUTH_CODE
               valueFrom:
                 secretKeyRef:
                   name: fyers-secret
-                  key: access_token
+                  key: auth_code
+            - name: FYERS_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: fyers-secret
+                  key: refresh_token
             - name: FYERS_WEBSOCKET_URL
               value: wss://example.com/ws
             - name: REDIS_URL
