@@ -12,14 +12,14 @@ from fyers_apiv3 import fyersModel
 from .config import settings
 
 
-def _build_session() -> fyersModel.SessionModel:
+def _build_session(grant_type: str = "authorization_code") -> fyersModel.SessionModel:
     """Create a configured SessionModel."""
     return fyersModel.SessionModel(
         client_id=settings.FYERS_APP_ID,
         secret_key=settings.FYERS_SECRET_KEY,
         redirect_uri=settings.FYERS_REDIRECT_URI,
         response_type="code",
-        grant_type="authorization_code",
+        grant_type=grant_type,
     )
 
 
@@ -33,6 +33,19 @@ async def exchange_auth_code(code: str) -> str:
     """Exchange an authorization code for an access token."""
     session = _build_session()
     session.set_token(code)
+    loop = asyncio.get_running_loop()
+    response: Dict[str, Any] = await loop.run_in_executor(None, session.generate_token)
+    return response.get("access_token", "")
+
+
+async def refresh_access_token(refresh_token: str, pin: str | None = None) -> str:
+    """Refresh an expired access token."""
+    session = _build_session("refresh_token")
+    session.set_token(refresh_token)
+    if pin is not None:
+        # The fyers_apiv3 client does not explicitly support the PIN field but
+        # accepts extra attributes which are sent in the request payload.
+        session.pin = pin  # type: ignore[attr-defined]
     loop = asyncio.get_running_loop()
     response: Dict[str, Any] = await loop.run_in_executor(None, session.generate_token)
     return response.get("access_token", "")
