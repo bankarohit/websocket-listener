@@ -27,11 +27,15 @@ def main():
     if not settings.FYERS_ACCESS_TOKEN and settings.FYERS_AUTH_CODE:
         logger.info("Exchanging auth code for access token")
         try:
-            token = asyncio.run(auth.exchange_auth_code(settings.FYERS_AUTH_CODE))
-            if token:
-                settings.FYERS_ACCESS_TOKEN = token
+            access, refresh = asyncio.run(
+                auth.exchange_auth_code(settings.FYERS_AUTH_CODE)
+            )
+            if access:
+                settings.FYERS_ACCESS_TOKEN = access
             else:
                 logger.warning("Auth code exchange returned empty token")
+            if refresh:
+                settings.FYERS_REFRESH_TOKEN = refresh
         except Exception:
             logger.exception("Failed to exchange auth code")
     logger.info("Starting WebSocket listener")
