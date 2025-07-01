@@ -16,16 +16,17 @@ class FakeSession:
         return "url"
 
     def generate_token(self):
-        return {"access_token": "TOKEN"}
+        return {"access_token": "TOKEN", "refresh_token": "REF"}
 
 
 @pytest.mark.asyncio
 async def test_exchange_auth_code(monkeypatch):
     monkeypatch.setattr(auth.fyersModel, "SessionModel", lambda *a, **k: FakeSession())
 
-    token = await auth.exchange_auth_code("code")
+    access, refresh = await auth.exchange_auth_code("code")
 
-    assert token == "TOKEN"
+    assert access == "TOKEN"
+    assert refresh == "REF"
 
 
 def test_generate_login_url(monkeypatch):

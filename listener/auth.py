@@ -29,13 +29,13 @@ def generate_login_url() -> str:
     return session.generate_authcode()
 
 
-async def exchange_auth_code(code: str) -> str:
-    """Exchange an authorization code for an access token."""
+async def exchange_auth_code(code: str) -> tuple[str, str]:
+    """Exchange an authorization code for an access and refresh token."""
     session = _build_session()
     session.set_token(code)
     loop = asyncio.get_running_loop()
     response: Dict[str, Any] = await loop.run_in_executor(None, session.generate_token)
-    return response.get("access_token", "")
+    return response.get("access_token", ""), response.get("refresh_token", "")
 
 
 async def refresh_access_token(refresh_token: str, pin: str | None = None) -> str:
@@ -63,16 +63,23 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     if args.auth_code:
-        token = asyncio.run(exchange_auth_code(args.auth_code))
+        access, refresh = asyncio.run(exchange_auth_code(args.auth_code))
         if args.write_env:
             env = Path(".env")
             lines = []
             if env.exists():
                 lines = [l.rstrip("\n") for l in env.read_text().splitlines() if l.strip()]
-                lines = [l for l in lines if not l.startswith("FYERS_ACCESS_TOKEN=")]
-            lines.append(f"FYERS_ACCESS_TOKEN={token}")
+                lines = [
+                    l
+                    for l in lines
+                    if not l.startswith("FYERS_ACCESS_TOKEN=")
+                    and not l.startswith("FYERS_REFRESH_TOKEN=")
+                ]
+            lines.append(f"FYERS_ACCESS_TOKEN={access}")
+            if refresh:
+                lines.append(f"FYERS_REFRESH_TOKEN={refresh}")
             env.write_text("\n".join(lines) + "\n")
-        print(token)
+        print(access)
     else:
         print(generate_login_url())
 

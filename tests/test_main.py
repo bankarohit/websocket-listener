@@ -70,12 +70,13 @@ def test_main_exchanges_auth_code(monkeypatch):
 
     async def fake_exchange(code):
         events["code"] = code
-        return "TOKEN123"
+        return "TOKEN123", "REFRESH123"
 
     monkeypatch.setattr(main_mod.auth, "exchange_auth_code", fake_exchange)
 
     async def fake_connect_and_listen():
         events["token"] = main_mod.settings.FYERS_ACCESS_TOKEN
+        events["refresh"] = main_mod.settings.FYERS_REFRESH_TOKEN
 
     monkeypatch.setattr(main_mod, "connect_and_listen", fake_connect_and_listen)
 
@@ -90,6 +91,7 @@ def test_main_exchanges_auth_code(monkeypatch):
     monkeypatch.setattr(main_mod.threading, "Thread", FakeThread)
 
     monkeypatch.setattr(main_mod.settings, "FYERS_ACCESS_TOKEN", "", raising=False)
+    monkeypatch.setattr(main_mod.settings, "FYERS_REFRESH_TOKEN", "", raising=False)
     monkeypatch.setattr(main_mod.settings, "FYERS_AUTH_CODE", "CODE", raising=False)
 
     def fake_asyncio_run(coro):
@@ -105,3 +107,4 @@ def test_main_exchanges_auth_code(monkeypatch):
 
     assert events["code"] == "CODE"
     assert events["token"] == "TOKEN123"
+    assert events["refresh"] == "REFRESH123"
